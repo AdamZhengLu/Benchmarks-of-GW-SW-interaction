@@ -23,6 +23,10 @@ For more details on the Benchmarks of GW-SW interaction and if you use these cas
    Painter, S.L., Collier, N. and Jan, A., 2016. Integrated Surface/Subsurface Flow Modeling in PFLOTRAN.
  ```
 
+Why benchmarking?
+--------------------
+Groundwater-surface water interactions play a crucial role in hydrologic cycles. There is a growing interest in developing integrated hydrologic models to describe groundwater-surface water interactions and the associated processes. Integrated hydrologic models are often utilized for studying the interaction between surface flow and variably saturated groundwater flow, and quantitively describing hydrologic responses. A wide variety of such models have been developed using different numerical algorithms and methodologies based on physical processes, which, however, is rather complicated yet challenging to describe such processes associated with groundwater-surface water interactions in terms of mathematical representations, discretization strategies, and computational costs. It is then natural and essential to benchmark and validate models from simplified representations to beyond.
+
 
 Getting  started
 --------------------
@@ -39,3 +43,11 @@ Eight examples show the older with increasing complexity
 6. `surface-subsurface_2D v-catchment return flow`: Coupled groundwater-surface water flow in a 2D return flow test case
 7. `surface-subsurface_2D sandbox`: Coupled groundwater-surface water flow first performed by simulating a laboratory experiment conducted by Abdul and Gillham
 8. `3d-hillslope`
+
+License
+--------------------
+Copyright (C) 2022  Zheng Lu
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation version 3 of the License
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>
