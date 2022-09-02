@@ -28,6 +28,18 @@ Why benchmarking?
 Groundwater-surface water interactions play a crucial role in hydrologic cycles. There is a growing interest in developing integrated hydrologic models to describe groundwater-surface water interactions and the associated processes. Integrated hydrologic models are often utilized for studying the interaction between surface flow and variably saturated groundwater flow, and quantitively describing hydrologic responses. A wide variety of such models have been developed using different numerical algorithms and methodologies based on physical processes, which, however, is rather complicated yet challenging to describe such processes associated with groundwater-surface water interactions in terms of mathematical representations, discretization strategies, and computational costs. It is then natural and essential to benchmark and validate models from simplified representations to beyond.
 
 
+Installing the Integrated hydrologic models
+--------------------
+The benchmark cases are provided using ParFlow and PFLOTRAN. To install them you will need to install the packages:
+1. ParFlow
+```
+https://www.parflow.org/
+```
+2. The PETSc (Portable Extensible Toolkit for Scientific Computation) libraries and PFLOTRAN
+```
+https://www.pflotran.org/
+```
+
 Getting  started
 --------------------
 Two overland flow-only benchmarking cases are involved and two integrated benchmarking cases are presented.
@@ -51,3 +63,8 @@ Copyright (C) 2022  Zheng Lu
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation version 3 of the License
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+References
+--------------------
++ Maxwell, R.R, et al. Parflow user's manual v3.10.
++ Lichtner, P.C., et al. PFLOTRAN user manual v4.0.
