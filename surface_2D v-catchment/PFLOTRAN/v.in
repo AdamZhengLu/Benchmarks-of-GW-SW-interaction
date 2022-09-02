@@ -1,0 +1,278 @@
+#Description: v-catchment
+
+SIMULATION
+  SIMULATION_TYPE SURFACE_SUBSURFACE
+  PROCESS_MODELS
+    SUBSURFACE_FLOW flow
+      MODE RICHARDS
+#      OPTIONS
+#        PRESSURE_DAMPENING_FACTOR 0.1
+#        MAX_PRESSURE_CHANGE 1.d4
+#      /
+    /
+    SURFACE_SUBSURFACE flow
+      MODE RICHARDS
+    /
+END
+
+#===============================================================================
+#=========================== subsurface flow ===================================
+#===============================================================================
+SUBSURFACE
+
+#=========================== regression =======================================
+#REGRESSION
+#END
+
+#=========================== solver options ===================================
+TIMESTEPPER FLOW
+#  MAX_STEPS 5000
+#  MAX_TS_CUTS 5000
+END
+
+NEWTON_SOLVER FLOW
+  RTOL 1.d-12
+  STOL 1.d-30
+  ITOL_UPDATE 1.d0
+  MAXIT 300
+END
+
+LINEAR_SOLVER FLOW
+  ATOL 1.d-12
+  DTOL 1.d-20
+  MAXIT 2500
+END
+
+#=========================== discretization ===================================
+GRID
+  TYPE unstructured ./grids.h5
+END
+
+#=========================== fluid properties =================================
+FLUID_PROPERTY
+  DIFFUSION_COEFFICIENT 1.d-9
+END
+
+#=========================== material properties ==============================
+MATERIAL_PROPERTY soil_property
+  ID 1
+  POROSITY 0.4d0
+  TORTUOSITY 1.0d0
+  SATURATION_FUNCTION sf1
+  PERMEABILITY
+    PERM_ISO 1.d-300
+  /
+END
+
+#=========================== characteristic curves ============================
+CHARACTERISTIC_CURVES sf1
+  SATURATION_FUNCTION VAN_GENUCHTEN
+    M 0.5d0
+    ALPHA  1.d-04
+    LIQUID_RESIDUAL_SATURATION 0.2d0
+  /
+  PERMEABILITY_FUNCTION MUALEM_VG_LIQ
+    M 0.5d0
+    LIQUID_RESIDUAL_SATURATION 0.2d0
+  /
+END
+
+#=========================== output options ===================================
+OUTPUT
+  PERIODIC TIME 1 min
+#  PRINT_PRIMAL_GRID
+#  FORMAT HDF5
+#  MASS_BALANCE
+#  VELOCITIES
+#  FLOWRATE
+END
+
+#=========================== times ============================================
+TIME
+  FINAL_TIME 181.d0 min
+  INITIAL_TIMESTEP_SIZE 1.d0 min
+#  MINIMUM_TIMESTEP_SIZE 1.d0 min
+  MAXIMUM_TIMESTEP_SIZE 1.d0 min
+END
+
+#=========================== regions ==========================================
+REGION all
+  COORDINATES
+    0.d0 0.d0 0.0d0
+    1620.d0 1000.d0 50.d0
+  /
+END 
+
+REGION top
+  FILE ./grids.h5
+END
+
+#=========================== flow conditions ==================================
+MINIMUM_HYDROSTATIC_PRESSURE -1.d0
+
+FLOW_CONDITION initial
+  TYPE
+    PRESSURE hydrostatic
+  /
+#  INTERPOLATION linear
+  DATUM 0.d0 0.d0 -1.0d0
+  PRESSURE 101325.d0
+#  GRADIENT
+#    PRESSURE 0.0 0.02 0.0
+#  /
+END
+
+FLOW_CONDITION from_surface
+  TYPE
+    PRESSURE heterogeneous_surface_seepage
+  /
+  PRESSURE 101325.d0
+/
+
+#=========================== condition couplers ===============================
+# initial condition
+INITIAL_CONDITION initial_copuler
+  FLOW_CONDITION initial
+  REGION all
+END
+
+# boundary condition
+BOUNDARY_CONDITION from_surface_bc
+  FLOW_CONDITION from_surface
+  REGION top
+/
+
+#=========================== stratigraphy couplers ============================
+STRATA
+  REGION all
+  MATERIAL soil_property
+END
+
+END_SUBSURFACE
+
+
+
+#===============================================================================
+#=========================== surface flow ======================================
+#===============================================================================
+SURFACE_FLOW
+
+#=========================== discretization ===================================
+SURF_GRID
+  TYPE unstructured ./grids.h5
+END
+
+SURF_FLOW_FORMULATION diffusive
+
+SURF_SUBSURFACE_COUPLING
+  seq_coupled
+END
+
+#=========================== material properties ==============================
+SURF_MATERIAL_PROPERTY surf_property_hill
+  ID 1
+  MANNINGS 0.015
+END
+
+SURF_MATERIAL_PROPERTY surf_property_channel
+  ID 2
+  MANNINGS 0.15
+END
+
+#=========================== output ==========================================
+SURF_OUTPUT
+  HYDROGRAPH
+END
+
+#=========================== times ============================================
+SURF_TIME
+  COUPLING_TIMESTEP_SIZE 1.0 min
+END
+
+#=========================== regions ==========================================
+SURF_REGION surf_all
+  COORDINATES
+    0.d0 0.d0 0.d0
+    1620.d0 1000.d0 100.d0
+  /
+END
+
+SURF_REGION surf_hill_left
+  COORDINATES
+    0.d0 0.d0 0.0d0
+    800.d0 1000.d0 100.d0
+  /
+END
+
+SURF_REGION surf_hill_right
+  COORDINATES
+    820.d0 0.d0 0.0d0
+    1620.d0 1000.d0 100.d0
+  /
+END
+
+SURF_REGION surf_channel
+  COORDINATES
+    800.d0 0.d0 0.0d0
+    820.d0 1000.d0 100.d0
+  /
+END
+
+SURF_REGION top
+  FILE ./grids.h5
+END
+
+SURF_REGION surf_south
+  FILE ./grids.h5
+END
+
+#=========================== flow conditions ==================================
+SURF_FLOW_CONDITION rain
+  TYPE
+    RATE volumetric_rate
+  /
+  RATE LIST
+    TIME_UNITS min
+    DATA_UNITS m^3/min
+    0.d0 1.8d-4
+    91.d0 0.d0
+  /
+END
+
+SURF_FLOW_CONDITION bc_south
+  TYPE
+    PRESSURE zero_gradient
+  /
+  PRESSURE 101325.d0
+END
+
+#=========================== condition couplers ===============================
+# source condition
+SURF_SOURCE_SINK top_rain
+  SURF_FLOW_CONDITION rain
+  SURF_REGION surf_all
+END
+
+# boundary condition
+SURF_BOUNDARY_CONDITION outflow
+  SURF_FLOW_CONDITION bc_south
+  SURF_REGION surf_south
+END
+
+#=========================== stratigraphy couplers ============================
+STRATA
+  SURF_REGION surf_hill_left
+  MATERIAL surf_property_hill
+END
+
+STRATA
+  SURF_REGION surf_hill_right
+  MATERIAL surf_property_hill
+END
+
+STRATA
+  SURF_REGION surf_channel
+  MATERIAL surf_property_channel
+END
+
+END_SURFACE_FLOW
